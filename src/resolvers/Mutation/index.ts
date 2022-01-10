@@ -1,5 +1,6 @@
-import * as authController from "../../controllers/auth"
+import * as authController from "@/controllers/auth"
 
 export default {
-    signIn: authController.signIn
+	signIn: authController.signIn,
+	signUp: authController.signUp,
 }

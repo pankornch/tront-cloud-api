@@ -1,6 +1,7 @@
+import { IUser } from "@/types"
 import { model, Schema, Types } from "mongoose"
 
-export default model(
+export default model<IUser>(
 	"Users",
 	new Schema(
 		{

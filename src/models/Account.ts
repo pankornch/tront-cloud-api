@@ -1,6 +1,7 @@
+import { IAccount } from "../types"
 import { model, Schema, Types } from "mongoose"
 
-export default model(
+export default model<IAccount>(
 	"Accounts",
 	new Schema(
 		{
@@ -14,7 +15,17 @@ export default model(
 				ref: "Users",
 				required: true,
 			},
+			email: {
+				type: String,
+				required: true
+			},
+			password: {
+				type: String,
+			},
 			token: {
+				type: String,
+			},
+			providerId: {
 				type: String
 			}
 		},
