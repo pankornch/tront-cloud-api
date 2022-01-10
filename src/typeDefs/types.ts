@@ -10,14 +10,14 @@ export default gql`
     type Account {
         _id: ID
         type: AuthTypes
-        providerId: ID
+        providerAccountId: ID
     }
 
     type AuthResponse {
         token: String!
         user: User!
         password: String
-        providerId: String
+        providerAccountId: String
     }
 
     enum AuthTypes {

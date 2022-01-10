@@ -15,7 +15,7 @@ export interface IAccount {
 	email: string
 	password?: string
 	token?: string
-	providerId?: string
+	providerAccountId?: string
 	createdAt: Date
 	updatedAt: Date
 }

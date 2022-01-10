@@ -25,7 +25,7 @@ export default model<IAccount>(
 			token: {
 				type: String,
 			},
-			providerId: {
+			providerAccountId: {
 				type: String
 			}
 		},

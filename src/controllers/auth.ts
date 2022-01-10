@@ -2,7 +2,7 @@ import { Resolver } from "@/types/gql"
 import { Account, User } from "../models"
 import Joi from "joi"
 import { UserInputError, AuthenticationError } from "apollo-server-core"
-import { EnumAuthTypes } from "@/types"
+import { AuthTypes, EnumAuthTypes } from "@/types"
 import bcrypt from "bcryptjs"
 import { createToken } from "@/utils/jwt"
 
@@ -16,7 +16,8 @@ interface SignUpInput extends SignInInput {
 }
 
 interface OauthInput {
-	providerId: string
+	type: AuthTypes
+	providerAccountId: string
 	email: string
 }
 
@@ -94,4 +95,45 @@ export const signUp: Resolver<
 	}
 }
 
-export const oauth: Resolver<null, { input: OauthInput }> = () => {}
+export const oauth: Resolver<null, { input: OauthInput }> = async (
+	parent,
+	{ input }
+) => {
+	const accountExist = await Account.findOne({
+		type: input.type,
+		providerAccountId: input.providerAccountId,
+	})
+
+	if (!accountExist) {
+		const account = new Account({
+			type: input.type,
+			email: input.email,
+			providerAccountId: input.providerAccountId,
+		})
+
+		const user = new User({
+			email: input.email,
+			accounts: [account._id],
+		})
+
+		account.user = user._id
+
+		await Promise.all([user.save(), account.save()])
+
+		const token = createToken(user._id.toString())
+
+		return {
+			token,
+			user,
+		}
+	}
+
+	const token = createToken(accountExist.user.toString())
+
+	const user = await User.findById(accountExist.user)
+
+	return {
+		token,
+		user,
+	}
+}

@@ -4,5 +4,6 @@ export default gql`
     type Mutation {
         signIn(input: SignInInput!): AuthResponse!
         signUp(input: SignUpInput!): AuthResponse!
+        oauth(input: OauthInput!): AuthResponse!
     }
 `
