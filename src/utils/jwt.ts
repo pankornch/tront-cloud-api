@@ -5,7 +5,8 @@ export const createToken = (payload: any) => {
 	return jwt.sign({ sub: payload }, JWT_SECRET!)
 }
 
-export const verifyToken = (token: string) => {
+export const verifyToken = (bearerToken: string) => {
+	const [bearer, token] = bearerToken.split(" ")
 	const result = jwt.verify(token, JWT_SECRET!)
 	return result
 }

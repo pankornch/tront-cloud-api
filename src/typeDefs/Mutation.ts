@@ -5,5 +5,7 @@ export default gql`
         signIn(input: SignInInput!): AuthResponse!
         signUp(input: SignUpInput!): AuthResponse!
         oauth(input: OauthInput!): AuthResponse!
+
+        createApp(input: CreateAppInput!): App!
     }
 `

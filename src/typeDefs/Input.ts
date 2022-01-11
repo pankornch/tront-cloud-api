@@ -17,4 +17,28 @@ export default gql`
 		providerAccountId: String!
 		email: String!
 	}
+
+	input CreateAppInput {
+		name: String!
+		slug: String!
+		modelConfigs: ModelConfigsInput!
+	}
+
+	input ModelConfigsInput {
+        models: [ModelInput]!
+    }
+
+    input ModelInput {
+        name: String!
+        fields: [FieldInput]!
+    }
+
+    input FieldInput {
+        name: String!
+        type: ModelTypes
+        required: Boolean!
+        defaultValue: String
+    }
+
+
 `

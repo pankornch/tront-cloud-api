@@ -14,6 +14,10 @@ async function startApolloServer(typeDefs: any, resolvers: any) {
 			typeDefs,
 			resolvers,
 			plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+			context: ({ req }) => {
+				const authorization = req.headers.authorization || ""
+				return { req, authorization }
+			},
 		})
 
 		await db()

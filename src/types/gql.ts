@@ -1,6 +1,9 @@
+import { IUser } from ".";
+
 export interface Context {
 	req: Express.Request
 	authorization: string
+	user?: IUser
 }
 
 export type Resolver<P = any, A = any> = (
