@@ -5,9 +5,12 @@ import http from "http"
 import typeDefs from "./typeDefs"
 import resolvers from "./resolvers"
 import db from "./configs/db"
+import api from "./generateApi"
 
 async function startApolloServer(typeDefs: any, resolvers: any) {
 	const app = express()
+	app.use("/api", api)
+	
 	const httpServer = http.createServer(app)
 	try {
 		const server = new ApolloServer({

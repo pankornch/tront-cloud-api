@@ -1,0 +1,27 @@
+###
+@url=http://localhost:4000/api
+
+###
+POST {{url}}/rest/a/m1
+Content-Type: application/json
+
+{
+    "f1": "test"
+}
+
+###
+GET {{url}}/rest/a/m1
+
+###
+GET {{url}}/rest/a/m1/61e1cc4fadc92af5f70d6359
+
+###
+PATCH  {{url}}/rest/a/m1/61e1cc4fadc92af5f70d6359
+Content-Type: application/json
+
+{
+    "f1": "test2"
+}
+
+###
+DELETE {{url}}/rest/a/m1/61e1cc4fadc92af5f70d6359
