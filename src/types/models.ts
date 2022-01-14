@@ -57,12 +57,14 @@ export interface IModelConfigs {
 
 export interface IModel {
 	_id: ID
+	app: ID | IApp
 	name: string
-	fields: IField[]
+	fields: ID[] | IField[]
 }
 
 export interface IField {
 	_id: ID
+	model: ID | IModel
 	name: string
 	type: ModelTypes
 	required: boolean
