@@ -59,12 +59,11 @@ export interface IModel {
 	_id: ID
 	app: ID | IApp
 	name: string
-	fields: ID[] | IField[]
+	fields: IField[]
 }
 
 export interface IField {
 	_id: ID
-	model: ID | IModel
 	name: string
 	type: ModelTypes
 	required: boolean
@@ -77,12 +76,14 @@ export interface IApiConfigs {
 }
 
 export interface IApiType {
+	app: ID | IApp
 	type: ApiTypes
 	url: string
 }
 
 export interface IApiSchema {
-	model: string | IModel
+	app: ID | IApp
+	model: ID | IModel
 	methods: IApiMethod[]
 }
 

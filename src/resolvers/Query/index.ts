@@ -1,5 +1,9 @@
-import hello from "./hello"
+import * as appController from "@/controllers/app"
+import { auth } from "@/middlewares/auth"
 
 export default {
-	hello,
+	hello: () => {
+		return "Hello"
+	},
+	apps: auth(appController.getApps),
 }

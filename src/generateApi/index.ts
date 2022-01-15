@@ -1,5 +1,4 @@
 import App from "@/models/App"
-import Field from "@/models/Field"
 import Model from "@/models/Model"
 import { ModelTypes } from "@/types"
 import express from "express"
@@ -41,7 +40,7 @@ router.get("/rest/:slug/:modelName", async (req, res) => {
 		slug: params.slug,
 	})
 	if (!app) {
-		res.status(403).json({ message: "Incorrect app" })
+		res.status(404).json({ message: `${params.slug} not found` })
 		return
 	}
 	const model = await Model.findOne({
@@ -55,8 +54,13 @@ router.get("/rest/:slug/:modelName", async (req, res) => {
 		],
 	}).lean()
 
+	if (!model) {
+		res.status(404).json({ message: `${params.modelName} not found` })
+		return
+	}
+
 	const dbName = `tront:${app.user}`
-	const colName = `${app._id}:${model!.name}`
+	const colName = `${app._id}:${model._id}`
 	const col = await apiModel({ dbName, colName })
 	const data = await col.find({}).toArray()
 
@@ -75,7 +79,8 @@ router.get("/rest/:slug/:modelName/:id", async (req, res) => {
 			slug: params.slug,
 		})
 		if (!app) {
-			throw new Error("Incorrect app")
+			res.status(404).json({ message: `${params.slug} not found` })
+			return
 		}
 		const model = await Model.findOne({
 			$and: [
@@ -89,11 +94,12 @@ router.get("/rest/:slug/:modelName/:id", async (req, res) => {
 		}).lean()
 
 		if (!model) {
-			throw new Error("Incorrect model")
+			res.status(404).json({ message: `${params.modelName} not found` })
+			return
 		}
 
 		const dbName = `tront:${app.user}`
-		const colName = `${app._id}:${model.name}`
+		const colName = `${app._id}:${model._id}`
 		const col = await apiModel({ dbName, colName })
 
 		const data = await col.findOne({
@@ -101,9 +107,8 @@ router.get("/rest/:slug/:modelName/:id", async (req, res) => {
 		})
 		client.close()
 		res.send({ data })
-	} catch (error) {
-		console.log(error)
-		res.send({ error })
+	} catch (error: any) {
+		res.send({ error: error.message })
 	}
 })
 
@@ -114,7 +119,8 @@ router.post("/rest/:slug/:modelName", async (req, res) => {
 			slug: params.slug,
 		})
 		if (!app) {
-			throw new Error("Incorrect app")
+			res.status(404).json({ message: `${params.slug} not found` })
+			return
 		}
 		const model = await Model.findOne({
 			$and: [
@@ -128,14 +134,11 @@ router.post("/rest/:slug/:modelName", async (req, res) => {
 		}).lean()
 
 		if (!model) {
-			throw new Error("Incorrect model")
+			res.status(404).json({ message: `${params.modelName} not found` })
+			return
 		}
 
-		const fields = await Field.find({
-			model: model._id,
-		}).lean()
-
-		const obj = fields.reduce((acc: any, curr) => {
+		const obj = model.fields!.reduce((acc: any, curr) => {
 			acc[curr.name] = mapToJoi(curr.type, curr.required)
 			return acc
 		}, {})
@@ -143,19 +146,21 @@ router.post("/rest/:slug/:modelName", async (req, res) => {
 		const { error } = Joi.object(obj).validate(body)
 
 		if (error) {
-			res.status(400).json({ error })
+			res
+				.status(400)
+				.json({ message: `${error.details[0].path} is not allowed.` })
 			return
 		}
 
 		const dbName = `tront:${app.user}`
-		const colName = `${app._id}:${model.name}`
+		const colName = `${app._id}:${model._id}`
 		const col = await apiModel({ dbName, colName })
 		const data = await col.insertOne(body)
 		client.close()
 		res.send({ data })
-	} catch (error) {
-		res.status(400).json({
-			error: error,
+	} catch (error: any) {
+		res.status(500).json({
+			error: error.message,
 		})
 	}
 })
@@ -168,7 +173,8 @@ router.patch("/rest/:slug/:modelName/:id", async (req, res) => {
 			slug: params.slug,
 		})
 		if (!app) {
-			throw new Error("Incorrect app")
+			res.status(404).json({ message: `${params.slug} not found` })
+			return
 		}
 		const model = await Model.findOne({
 			$and: [
@@ -182,14 +188,11 @@ router.patch("/rest/:slug/:modelName/:id", async (req, res) => {
 		}).lean()
 
 		if (!model) {
-			throw new Error("Incorrect model")
+			res.status(404).json({ message: `${params.modelName} not found` })
+			return
 		}
 
-		const fields = await Field.find({
-			model: model._id,
-		}).lean()
-
-		const obj = fields.reduce((acc: any, curr) => {
+		const obj = model.fields.reduce((acc: any, curr) => {
 			acc[curr.name] = mapToJoi(curr.type, false)
 			return acc
 		}, {})
@@ -197,11 +200,13 @@ router.patch("/rest/:slug/:modelName/:id", async (req, res) => {
 		const { error } = Joi.object(obj).validate(body)
 
 		if (error) {
-			res.status(400).json({ error })
+			res.status(400).json({
+				message: `${error.details[0].path} is not allowed.`,
+			})
 			return
 		}
 		const dbName = `tront:${app.user}`
-		const colName = `${app._id}:${model.name}`
+		const colName = `${app._id}:${model._id}`
 		const col = await apiModel({ dbName, colName })
 		const data = await col.updateOne(
 			{ _id: ObjectId.createFromHexString(params.id) },
@@ -209,8 +214,11 @@ router.patch("/rest/:slug/:modelName/:id", async (req, res) => {
 		)
 		client.close()
 		res.send({ data })
-	} catch (error) {
-		res.send({ error })
+	} catch (error: any) {
+		console.log(error.message)
+		res.status(500).json({
+			error: error.message,
+		})
 	}
 })
 
@@ -222,7 +230,8 @@ router.delete("/rest/:slug/:modelName/:id", async (req, res) => {
 			slug: params.slug,
 		})
 		if (!app) {
-			throw new Error("Incorrect app")
+			res.status(404).json({ message: `${params.slug} not found` })
+			return
 		}
 		const model = await Model.findOne({
 			$and: [
@@ -236,11 +245,12 @@ router.delete("/rest/:slug/:modelName/:id", async (req, res) => {
 		}).lean()
 
 		if (!model) {
-			throw new Error("Incorrect model")
+			res.status(404).json({ message: `${params.modelName} not found` })
+			return
 		}
 
 		const dbName = `tront:${app.user}`
-		const colName = `${app._id}:${model.name}`
+		const colName = `${app._id}:${model._id}`
 		const col = await apiModel({ dbName, colName })
 
 		const result = await col.deleteOne({

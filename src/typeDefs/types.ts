@@ -23,6 +23,8 @@ export default gql`
         name: String!
         slug: String!
         active: Boolean!
+        modelConfigs: ModelConfigs!
+        apiConfigs: ApiConfigs!
     }
 
     type ModelConfigs {
@@ -40,7 +42,28 @@ export default gql`
         required: Boolean!
         defaultValue: String
     }
+
+    type ApiConfigs {
+        apiTypes:[ApiType]!
+        apiSchemas: [ApiSchema]!
+    }
+
+    type ApiType {
+        type: ApiTypes!
+        url: String!
+    }
     
+    type ApiSchema {
+        model: Model!
+        methods: [ApiMethod]!
+    }
+
+    type ApiMethod {
+        name: String!
+        pathname: String!
+        active: Boolean!
+        public: Boolean!
+    }
 
     enum AuthTypes {
 		GOOGLE
@@ -55,6 +78,18 @@ export default gql`
         DATE
         OBJECT
         ARRAY
+    }
+
+    enum ApiTypes {
+        REST
+    }
+
+    enum ApiMethodNames {
+        GET_LL
+        GET_ONE
+        POST
+        PATCH
+        DELETE
     }
 
     scalar Date

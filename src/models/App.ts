@@ -17,6 +17,7 @@ export default model<IApp>(
 			slug: {
 				type: String,
 				required: true,
+				unique: true,
 			},
 			active: {
 				type: Boolean,

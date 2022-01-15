@@ -16,8 +16,21 @@ export default model<IModel>(
 			},
 			fields: [
 				{
-					type: Types.ObjectId,
-					ref: "Fields",
+					name: {
+						type: String,
+						required: true,
+					},
+					type: {
+						type: String,
+						required: true,
+					},
+					required: {
+						type: Boolean,
+						default: false,
+					},
+					defaultValue: {
+						type: String,
+					},
 				},
 			],
 		},
