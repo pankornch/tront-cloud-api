@@ -42,6 +42,7 @@ export interface IApp {
 	_id: ID
 	user: ID | IUser
 	name: string
+	description?: string
 	slug: string
 	active: boolean
 	modelConfigs: IModelConfigs

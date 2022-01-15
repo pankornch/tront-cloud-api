@@ -21,6 +21,7 @@ export default gql`
     type App {
         _id: ID!
         name: String!
+        description: String
         slug: String!
         active: Boolean!
         modelConfigs: ModelConfigs!

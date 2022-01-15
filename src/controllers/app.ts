@@ -13,6 +13,7 @@ export const createApp: Resolver<null, { input: CreateAppInput }> = async (
 	const app = new App({
 		name: input.name,
 		slug: input.slug,
+		description: input.description,
 		user: user!._id,
 	})
 

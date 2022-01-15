@@ -21,6 +21,7 @@ export default gql`
 	input CreateAppInput {
 		name: String!
 		slug: String!
+		description: String
 		modelConfigs: ModelConfigsInput!
 	}
 
