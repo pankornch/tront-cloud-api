@@ -6,4 +6,5 @@ export default {
 		return "Hello"
 	},
 	apps: auth(appController.getApps),
+	app: auth(appController.getAppBySlug),
 }

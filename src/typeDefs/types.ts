@@ -33,6 +33,7 @@ export default gql`
     }
 
     type Model {
+        _id: ID!
         name: String!
         fields: [Field]!
     }

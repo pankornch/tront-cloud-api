@@ -4,5 +4,6 @@ export default gql`
     type Query {
         hello: String
         apps: [App]!
+        app(slug: ID!): App!
     }
 `

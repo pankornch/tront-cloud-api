@@ -8,7 +8,7 @@ const router = express.Router()
 import { MongoClient, ObjectId } from "mongodb"
 router.use(express.json())
 
-const url = "mongodb://localhost:27018"
+const url = "mongodb://localhost:27017"
 const client = new MongoClient(url)
 
 const apiModel = async ({ dbName, colName }: any) => {
@@ -28,6 +28,8 @@ const mapToJoi = (type: ModelTypes, required: boolean) => {
 		case "NUMBER":
 			joi = joi.number()
 			break
+		default:
+			joi = joi.string()
 	}
 
 	if (required) joi = joi.required()
@@ -63,8 +65,6 @@ router.get("/rest/:slug/:modelName", async (req, res) => {
 	const colName = `${app._id}:${model._id}`
 	const col = await apiModel({ dbName, colName })
 	const data = await col.find({}).toArray()
-
-	client.close()
 
 	res.send({
 		data,
@@ -105,7 +105,7 @@ router.get("/rest/:slug/:modelName/:id", async (req, res) => {
 		const data = await col.findOne({
 			_id: ObjectId.createFromHexString(params.id),
 		})
-		client.close()
+
 		res.send({ data })
 	} catch (error: any) {
 		res.send({ error: error.message })
@@ -138,10 +138,13 @@ router.post("/rest/:slug/:modelName", async (req, res) => {
 			return
 		}
 
-		const obj = model.fields!.reduce((acc: any, curr) => {
-			acc[curr.name] = mapToJoi(curr.type, curr.required)
-			return acc
-		}, {})
+		const obj: any = {}
+
+		for (const field of model.fields) {
+			if (field.name !== "_id") {
+				obj[field.name] = mapToJoi(field.type, field.required)
+			}
+		}
 
 		const { error } = Joi.object(obj).validate(body)
 
@@ -156,7 +159,7 @@ router.post("/rest/:slug/:modelName", async (req, res) => {
 		const colName = `${app._id}:${model._id}`
 		const col = await apiModel({ dbName, colName })
 		const data = await col.insertOne(body)
-		client.close()
+
 		res.send({ data })
 	} catch (error: any) {
 		res.status(500).json({
@@ -192,10 +195,13 @@ router.patch("/rest/:slug/:modelName/:id", async (req, res) => {
 			return
 		}
 
-		const obj = model.fields.reduce((acc: any, curr) => {
-			acc[curr.name] = mapToJoi(curr.type, false)
-			return acc
-		}, {})
+		const obj: any = {}
+
+		for (const field of model.fields) {
+			if (field.name !== "_id") {
+				obj[field.name] = mapToJoi(field.type, field.required)
+			}
+		}
 
 		const { error } = Joi.object(obj).validate(body)
 
@@ -212,7 +218,7 @@ router.patch("/rest/:slug/:modelName/:id", async (req, res) => {
 			{ _id: ObjectId.createFromHexString(params.id) },
 			{ $set: body }
 		)
-		client.close()
+
 		res.send({ data })
 	} catch (error: any) {
 		console.log(error.message)
@@ -256,7 +262,7 @@ router.delete("/rest/:slug/:modelName/:id", async (req, res) => {
 		const result = await col.deleteOne({
 			_id: ObjectId.createFromHexString(params.id),
 		})
-		client.close()
+
 		res.send({ result })
 	} catch (error) {
 		res.send({ error })

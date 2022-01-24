@@ -73,7 +73,7 @@ export interface IField {
 
 export interface IApiConfigs {
 	apiTypes: IApiType[]
-	schemas: IApiSchema[]
+	apiSchemas: IApiSchema[]
 }
 
 export interface IApiType {

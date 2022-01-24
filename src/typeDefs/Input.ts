@@ -23,6 +23,7 @@ export default gql`
 		slug: String!
 		description: String
 		modelConfigs: ModelConfigsInput!
+		apiConfigs: ApiConfigsInput
 	}
 
 	input ModelConfigsInput {
@@ -41,5 +42,30 @@ export default gql`
         defaultValue: String
     }
 
+	input ApiConfigsInput {
+		apiTypes: [ApiTypeInput]
+		apiSchemas: [ApiSchemaConfigInput]
+	}
+
+	input ApiTypeInput {
+		type: String!
+		url: String!
+	}
+
+	input ApiSchemaConfigInput {
+		model: ApiModelInput!
+		methods: [ApiMethodInput]
+	}
+
+	input ApiMethodInput {
+		name: String!
+		pathname: String
+		active: Boolean!
+		public: Boolean!
+	}
+
+	input ApiModelInput {
+		name: String!
+	}
 
 `
