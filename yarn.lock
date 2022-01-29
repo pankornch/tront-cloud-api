@@ -378,6 +378,11 @@ anymatch@~3.1.2:
     normalize-path "^3.0.0"
     picomatch "^2.0.4"
 
+api-query-params@^5.3.1:
+  version "5.3.1"
+  resolved "https://registry.yarnpkg.com/api-query-params/-/api-query-params-5.3.1.tgz#3530590e979dee245596875ce678baad9a378042"
+  integrity sha512-1Y+iFakZhZ025kOQ7bAXNT1MdsqQl0a0c/maod/81Q9M3cVxUtxjN3L3oMwQwsKxyQi1kpBMkfcyB4mVdIcvtw==
+
 apollo-datasource@^3.3.0:
   version "3.3.0"
   resolved "https://registry.npmjs.org/apollo-datasource/-/apollo-datasource-3.3.0.tgz"
