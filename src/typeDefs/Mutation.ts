@@ -7,5 +7,7 @@ export default gql`
         oauth(input: OauthInput!): AuthResponse!
 
         createApp(input: CreateAppInput!): App!
+        updateApp(input: UpdateAppInput!): App!
+        deleteApp(input: DeleteAppInput!): String!
     }
 `

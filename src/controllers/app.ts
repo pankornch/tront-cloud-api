@@ -218,3 +218,56 @@ export const getAppBySlug: Resolver = async (_, { slug }, { user }) => {
 
 	return app
 }
+
+interface UpdateAppInput {
+	_id: string
+	name?: string
+	slug?: string
+	description?: string
+}
+export const updateApp: Resolver<any, { input: UpdateAppInput }> = async (
+	_,
+	{ input },
+	{ user }
+) => {
+	const app = await App.updateOne(
+		{
+			$and: [
+				{
+					user: user!._id,
+				},
+				{
+					_id: input._id,
+				},
+			],
+		},
+		{
+			$set: input,
+		}
+	)
+
+	if (!app.matchedCount) {
+		throw new UserInputError("Incorrect app id")
+	}
+
+	return await App.findById(input._id).lean()
+}
+
+interface DeleteAppInput {
+	_id: string
+}
+export const deleteApp: Resolver<any, { input: DeleteAppInput }> = async (
+	_,
+	{ input },
+	{ user }
+) => {
+	const app = await App.deleteOne({
+		$and: [{ _id: input._id }, { user: user!._id }],
+	})
+
+	if (!app.deletedCount) {
+		throw new UserInputError("Incorrect app id")
+	}
+
+	return "Delete Successful"
+}

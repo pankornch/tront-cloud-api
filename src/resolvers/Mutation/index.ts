@@ -8,4 +8,6 @@ export default {
 	oauth: authController.oauth,
 
 	createApp: auth(appController.createApp),
+	updateApp: auth(appController.updateApp),
+	deleteApp: auth(appController.deleteApp)
 }

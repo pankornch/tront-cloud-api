@@ -68,4 +68,15 @@ export default gql`
 		name: String!
 	}
 
+	input UpdateAppInput {
+		_id: ID!
+		name: String
+		slug: String
+		description: String
+	}
+
+	input DeleteAppInput {
+		_id: ID!
+	}
+
 `

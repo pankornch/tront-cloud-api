@@ -13,3 +13,10 @@ export enum EnumAuthTypes {
 	GITHUB = "GITHUB",
 	CREDENTIALS = "CREDENTIALS",
 }
+
+export type ApiTokenTypes = "MODEL" | "APP"
+
+export enum EnumApiTokenTypes {
+	MODEL = "MODEL",
+	APP = "APP",
+}
