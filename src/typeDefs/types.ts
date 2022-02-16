@@ -56,6 +56,7 @@ export default gql`
     }
     
     type ApiSchema {
+        _id: ID!
         model: Model!
         methods: [ApiMethod]!
     }
@@ -65,6 +66,11 @@ export default gql`
         pathname: String!
         active: Boolean!
         public: Boolean!
+    }
+
+    type Schema {
+        model: Model!
+        apiSchema: ApiSchema!
     }
 
     enum AuthTypes {
@@ -92,6 +98,11 @@ export default gql`
         POST
         PATCH
         DELETE
+    }
+
+    enum AccessApiTokenTypes {
+        APP
+        MODEL
     }
 
     scalar Date

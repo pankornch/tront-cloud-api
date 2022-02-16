@@ -9,5 +9,10 @@ export default gql`
         createApp(input: CreateAppInput!): App!
         updateApp(input: UpdateAppInput!): App!
         deleteApp(input: DeleteAppInput!): String!
+
+        createSchema(input: CreateSchemaInput!): Schema!
+        deleteSchema(input: DeleteSchemaInput!): String!
+
+        createAccessApiToken(input: CreateAccessApiTokenInput!): String!
     }
 `

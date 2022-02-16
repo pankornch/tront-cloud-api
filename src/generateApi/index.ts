@@ -1,80 +1,20 @@
 import App from "@/models/App"
 import Model from "@/models/Model"
-import { ApiNames, IModel, ModelTypes } from "@/types"
+import { ID } from "@/types"
 import express from "express"
 import Joi from "joi"
 import aqp from "api-query-params"
 
 const router = express.Router()
-import { MongoClient, ObjectId } from "mongodb"
-import ApiSchema from "@/models/ApiSchema"
+import { ObjectId } from "mongodb"
+import { apiNamespace } from "@/utils/apiNamespace"
+import {
+	validateApiMethod,
+	mapToJoi,
+	apiModel,
+} from "@/utils/generateApiHelper"
+
 router.use(express.json())
-
-const url = "mongodb://localhost:27017"
-const client = new MongoClient(url)
-
-const apiModel = async ({ dbName, colName }: any) => {
-	await client.connect()
-	const db = client.db(dbName)
-
-	const col = db.collection(colName)
-	return col
-}
-
-const mapToJoi = (type: ModelTypes, required: boolean) => {
-	let joi: any = Joi
-	switch (type) {
-		case "STRING":
-			joi = joi.string()
-			break
-		case "NUMBER":
-			joi = joi.number()
-			break
-		default:
-			joi = joi.string()
-	}
-
-	if (required) joi = joi.required()
-	return joi
-}
-
-interface ValidateApiMetodProps {
-	model: IModel
-	params: Record<string, any>
-	methodName: ApiNames
-}
-
-const validateApiMethod = async ({
-	model,
-	params,
-	methodName,
-}: ValidateApiMetodProps) => {
-	const apiSchema = await ApiSchema.findOne({
-		model: model._id,
-	}).lean()
-
-	if (!apiSchema) {
-		return {
-			status: false,
-			code: 404,
-			message: `${params.modelName} not found`,
-		}
-	}
-
-	const method = apiSchema.methods.find((e) => e.name === methodName)!
-
-	if (!method.active) {
-		return {
-			status: false,
-			code: 403,
-			message: "",
-		}
-	}
-
-	return {
-		status: true,
-	}
-}
 
 router.get("/rest/:slug/:modelName", async (req, res) => {
 	const { params } = req
@@ -114,9 +54,9 @@ router.get("/rest/:slug/:modelName", async (req, res) => {
 		res.status(result!.code!).send(result.message)
 		return
 	}
-
-	const dbName = `tront:${app.user}`
-	const colName = `${app._id}:${model._id}`
+	;`tront:${app.user}`
+	const dbName = apiNamespace.dbName(app.user as ID)
+	const colName = apiNamespace.colName(app._id, model._id)
 	const col = await apiModel({ dbName, colName })
 	const data = await col
 		.find()
@@ -242,7 +182,7 @@ router.post("/rest/:slug/:modelName", async (req, res) => {
 		if (error) {
 			res
 				.status(400)
-				.json({ message: `${error.details[0].path} is not allowed.` })
+				.json({ message: error.details[0].message.replace(/\"/g, "") })
 			return
 		}
 

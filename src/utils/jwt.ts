@@ -1,12 +1,27 @@
 import jwt from "jsonwebtoken"
 import { JWT_SECRET } from "@/configs/env"
 
-export const createToken = (payload: any) => {
-	return jwt.sign({ sub: payload }, JWT_SECRET!)
+interface Option {
+	secret?: string
+	expiresIn?: string | number
 }
 
-export const verifyToken = (bearerToken: string) => {
+type CreateTokenProps = (payload: any, option?: Option) => string
+
+export const createToken: CreateTokenProps = (payload: any, option) => {
+	return jwt.sign(
+		{ sub: payload },
+		option?.secret || JWT_SECRET!,
+		option?.expiresIn
+			? {
+					expiresIn: option.expiresIn,
+			  }
+			: undefined
+	)
+}
+
+export const verifyToken = (bearerToken: string, secret?: string) => {
 	const [bearer, token] = bearerToken.split(" ")
-	const result = jwt.verify(token, JWT_SECRET!)
+	const result = jwt.verify(token, secret || JWT_SECRET!)
 	return result
 }

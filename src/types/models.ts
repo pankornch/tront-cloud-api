@@ -1,4 +1,4 @@
-import { AuthTypes, ID } from "."
+import { ApiTokenTypes, AuthTypes, ID } from "."
 
 export type ModelTypes =
 	| "OBJECT_ID"
@@ -83,6 +83,7 @@ export interface IApiType {
 }
 
 export interface IApiSchema {
+	_id: ID
 	app: ID | IApp
 	model: ID | IModel
 	methods: IApiMethod[]
@@ -93,4 +94,17 @@ export interface IApiMethod {
 	active: boolean
 	public: boolean
 	pathname: string
+}
+
+
+
+export interface IApiToken {
+	_id: ID
+	subId: ID
+	type: ApiTokenTypes
+	version: string
+	token: string
+	expiredAt: Date
+	createdAt: Date
+	updatedAt: Date
 }

@@ -27,24 +27,24 @@ export default gql`
 	}
 
 	input ModelConfigsInput {
-        models: [ModelInput]!
-    }
+		models: [ModelInput]!
+	}
 
-    input ModelInput {
-        name: String!
-        fields: [FieldInput]!
-    }
+	input ModelInput {
+		name: String!
+		fields: [FieldInput]!
+	}
 
-    input FieldInput {
-        name: String!
-        type: ModelTypes
-        required: Boolean!
-        defaultValue: String
-    }
+	input FieldInput {
+		name: String!
+		type: ModelTypes
+		required: Boolean!
+		defaultValue: String
+	}
 
 	input ApiConfigsInput {
 		apiTypes: [ApiTypeInput]
-		apiSchemas: [ApiSchemaConfigInput]
+		apiSchemas: [ApiSchemaInput]
 	}
 
 	input ApiTypeInput {
@@ -52,7 +52,7 @@ export default gql`
 		url: String!
 	}
 
-	input ApiSchemaConfigInput {
+	input ApiSchemaInput {
 		model: ApiModelInput!
 		methods: [ApiMethodInput]
 	}
@@ -79,4 +79,40 @@ export default gql`
 		_id: ID!
 	}
 
+	input CreateAccessApiTokenInput {
+		type: AccessApiTokenTypes!
+		subId: String!
+	}
+
+	input GetAccessApiTokenInput {
+		type: AccessApiTokenTypes!
+		subId: String!
+	}
+
+	input CreateModelInput {
+		model: ModelInput!
+		apiSchema: ApiSchemaInput!
+	}
+
+	input UpdateModelInput {
+		_id: ID!
+		name: String!
+		fields: [FieldInput!]!
+	}
+
+	input UpdateApiSchemaInput {
+		modelId: ID!
+		methods: [ApiMethodInput]!
+	}
+
+	input CreateSchemaInput {
+		model: ModelInput!
+		apiSchema: ApiSchemaInput!
+		appId: ID!
+	}
+
+	input DeleteSchemaInput {
+		modelId: ID!
+		appId: ID!
+	}
 `
