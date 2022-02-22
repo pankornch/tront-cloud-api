@@ -11,6 +11,7 @@ export default gql`
         deleteApp(input: DeleteAppInput!): String!
 
         createSchema(input: CreateSchemaInput!): Schema!
+        updateSchema(input: UpdateSchemaInput!): Schema!
         deleteSchema(input: DeleteSchemaInput!): String!
 
         createAccessApiToken(input: CreateAccessApiTokenInput!): String!

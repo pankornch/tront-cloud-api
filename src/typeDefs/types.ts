@@ -26,6 +26,7 @@ export default gql`
         active: Boolean!
         modelConfigs: ModelConfigs!
         apiConfigs: ApiConfigs!
+        createdAt: Date!
     }
 
     type ModelConfigs {

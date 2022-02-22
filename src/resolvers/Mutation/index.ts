@@ -14,6 +14,7 @@ export default {
 	deleteApp: auth(appController.deleteApp),
 
 	createSchema: auth(schemaController.createSchema),
+	updateSchema: auth(schemaController.updateSchema),
 	deleteSchema: auth(schemaController.deleteSchema),
 
 	createAccessApiToken: auth(accessApiToken.createAccessToken),

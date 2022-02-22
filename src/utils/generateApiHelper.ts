@@ -1,8 +1,9 @@
 import ApiSchema from "@/models/ApiSchema"
-import { ModelTypes, IModel, ApiNames } from "@/types"
+import App from "@/models/App"
+import Model from "@/models/Model"
+import { ModelTypes, IModel, ApiNames, IApp } from "@/types"
 import Joi from "joi"
 import { MongoClient } from "mongodb"
-
 
 const url = "mongodb://localhost:27017"
 const client = new MongoClient(url)
@@ -34,13 +35,11 @@ export const mapToJoi = (type: ModelTypes, required: boolean) => {
 
 interface ValidateApiMetodProps {
 	model: IModel
-	params: Record<string, any>
 	methodName: ApiNames
 }
 
 export const validateApiMethod = async ({
 	model,
-	params,
 	methodName,
 }: ValidateApiMetodProps) => {
 	const apiSchema = await ApiSchema.findOne({
@@ -51,7 +50,7 @@ export const validateApiMethod = async ({
 		return {
 			status: false,
 			code: 404,
-			message: `${params.modelName} not found`,
+			message: `${model.name} not found`,
 		}
 	}
 
@@ -67,5 +66,70 @@ export const validateApiMethod = async ({
 
 	return {
 		status: true,
+	}
+}
+
+interface ValidateApp {
+	appSlug: string
+	modelName: String
+	methodName: ApiNames
+}
+
+interface ValidateAppResult {
+	status: boolean
+	code?: number
+	message?: string
+	app?: IApp
+	model?: IModel
+}
+
+export const validateApp = async ({
+	appSlug,
+	modelName,
+	methodName,
+}: ValidateApp): Promise<ValidateAppResult> => {
+	const app = await App.findOne({
+		slug: appSlug,
+	})
+	if (!app) {
+		return {
+			status: false,
+			code: 404,
+			message: `${appSlug} not found`,
+		}
+	}
+
+	const model = await Model.findOne({
+		$and: [
+			{
+				app: app._id,
+			},
+			{
+				name: modelName,
+			},
+		],
+	}).lean()
+
+	if (!model) {
+		return {
+			status: false,
+			code: 404,
+			message: `${modelName} not found!`,
+		}
+	}
+
+	const result = await validateApiMethod({
+		model,
+		methodName,
+	})
+
+	if (!result.status) {
+		return result
+	}
+
+	return {
+		status: true,
+		app,
+		model,
 	}
 }

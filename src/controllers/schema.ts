@@ -63,7 +63,7 @@ export const updateSchema: Resolver<any, UpdateSchemaInput> = async (
 	}
 
 	const [model, apiSchema] = await Promise.all([
-		Model.updateOne(
+		Model.findOneAndUpdate(
 			{
 				$and: [
 					{
@@ -74,12 +74,13 @@ export const updateSchema: Resolver<any, UpdateSchemaInput> = async (
 					},
 				],
 			},
-			{ $set: input.model }
+			{ $set: input.model },
+			{ new: true }
 		),
-		ApiSchema.updateOne(
+		ApiSchema.findOneAndUpdate(
 			{
 				$and: [
-					{ _id: input.apiSchema._id },
+					{ model: input.model._id },
 					{
 						app: input.appId,
 					},
@@ -87,7 +88,8 @@ export const updateSchema: Resolver<any, UpdateSchemaInput> = async (
 			},
 			{
 				$set: input.apiSchema,
-			}
+			},
+			{ new: true }
 		),
 	])
 

@@ -31,6 +31,7 @@ export default gql`
 	}
 
 	input ModelInput {
+		_id: String
 		name: String!
 		fields: [FieldInput]!
 	}
@@ -53,7 +54,8 @@ export default gql`
 	}
 
 	input ApiSchemaInput {
-		model: ApiModelInput!
+		_id: String
+		model: ApiModelInput
 		methods: [ApiMethodInput]
 	}
 
@@ -65,6 +67,7 @@ export default gql`
 	}
 
 	input ApiModelInput {
+		_id: String
 		name: String!
 	}
 
@@ -106,6 +109,12 @@ export default gql`
 	}
 
 	input CreateSchemaInput {
+		model: ModelInput!
+		apiSchema: ApiSchemaInput!
+		appId: ID!
+	}
+
+	input UpdateSchemaInput {
 		model: ModelInput!
 		apiSchema: ApiSchemaInput!
 		appId: ID!
