@@ -5,13 +5,13 @@ const wait = (ms: number) => {
 	return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-export default async () => {
+export default async (databaseUri?: string) => {
 	let error: any
 
 	console.log("\n Connecting database... \n")
 	
 	for (let i = 1; i <= 5; i++) {
-		const conn = await connet()
+		const conn = await connet(databaseUri)
 		if (!conn?.error) {
 			console.log("Database Connected")
 			return null
@@ -26,11 +26,11 @@ export default async () => {
 	throw error
 }
 
-const connet = async () => {
+const connet = async (databaseUri?: string) => {
 	console.log("\n Connecting database... \n")
 	try {
 		const uri = DATABASE_URL + "/" + DATABASE_NAME
-		await mongoose.connect(uri)
+		await mongoose.connect(databaseUri || uri)
 		return
 	} catch (error: any) {
 		return {

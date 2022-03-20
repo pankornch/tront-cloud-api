@@ -7,7 +7,7 @@
     "outDir": "dist",
     "rootDir": "./",
     "strict": true,
-    "types": ["node"],
+    "types": ["node", "jest"],
     "esModuleInterop": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
@@ -22,5 +22,5 @@
 
     }
   },
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "**/*.test.*"]
 }

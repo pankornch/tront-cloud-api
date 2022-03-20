@@ -96,12 +96,14 @@ export default gql`
 
 	input CreateSchemaInput {
 		model: ModelInput!
+		modelRelationships: [ModelRelationshipInput]
 		apiSchema: ApiSchemaInput!
 		appId: ID!
 	}
 
 	input UpdateSchemaInput {
 		model: ModelInput!
+		modelRelationships: [ModelRelationshipInput]
 		apiSchema: ApiSchemaInput!
 		appId: ID!
 	}
@@ -127,5 +129,14 @@ export default gql`
 	input ActionInviteInput {
 		appId: ID!
 		status: Boolean!
+	}
+
+	input ModelRelationshipInput {
+		_id: ID
+		localModel: ID
+		localField: String!
+		hasMany: Boolean!
+		targetModel: ID!
+		alias: String
 	}
 `

@@ -35,6 +35,7 @@ export default gql`
     type ModelConfigs {
         app: App!
         models: [Model]!
+        modelRelationships: [ModelRelationship]!
     }
 
     type Model {
@@ -86,6 +87,15 @@ export default gql`
         status: Boolean!
         createdAt: Date!
         updatedAt: Date!
+    }
+
+    type ModelRelationship {
+        _id: ID!
+        localModel: Model!
+        localField: String!
+        targetModel: Model!
+        hasMany: Boolean!
+        alias: String!
     }
 
     enum AuthTypes {
