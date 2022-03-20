@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken"
-import { JWT_SECRET } from "@/configs/env"
+import { JWT_SECRET } from "../configs/env"
 
 interface Option {
 	secret?: string

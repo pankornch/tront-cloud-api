@@ -1,10 +1,10 @@
-import { Resolver } from "@/types/gql"
+import { Resolver } from "../types/gql"
 import { Account, User } from "../models"
 import Joi from "joi"
 import { UserInputError, AuthenticationError } from "apollo-server-core"
-import { AuthTypes, EnumAuthTypes } from "@/types"
+import { AuthTypes, EnumAuthTypes } from "../types"
 import bcrypt from "bcryptjs"
-import { createToken } from "@/utils/jwt"
+import { createToken } from "../utils/jwt"
 
 interface SignInInput {
 	email: string
@@ -19,10 +19,11 @@ interface OauthInput {
 	type: AuthTypes
 	providerAccountId: string
 	email: string
+	avatar: string,
 }
 
 export const signIn: Resolver<null, { input: SignInInput }> = async (
-	parent,
+	_,
 	{ input }
 ) => {
 	const account = await Account.findOne({
@@ -53,7 +54,7 @@ export const signUp: Resolver<
 	{
 		input: SignUpInput
 	}
-> = async (parent, { input }) => {
+> = async (_, { input }) => {
 	const { error } = Joi.object({
 		email: Joi.string().email().required(),
 		password: Joi.string().min(6).required(),
@@ -84,6 +85,7 @@ export const signUp: Resolver<
 	})
 
 	account.user = user._id
+	user.avatar = `https://avatars.dicebear.com/api/identicon/${user._id}.svg`
 
 	await Promise.all([user.save(), account.save()])
 
@@ -96,7 +98,7 @@ export const signUp: Resolver<
 }
 
 export const oauth: Resolver<null, { input: OauthInput }> = async (
-	parent,
+	_,
 	{ input }
 ) => {
 	const accountExist = await Account.findOne({
@@ -114,6 +116,7 @@ export const oauth: Resolver<null, { input: OauthInput }> = async (
 		const user = new User({
 			email: input.email,
 			accounts: [account._id],
+			avatar: input.avatar,
 		})
 
 		account.user = user._id

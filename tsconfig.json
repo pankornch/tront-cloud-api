@@ -5,7 +5,7 @@
     "lib": ["dom", "es6", "es2017", "esnext.asynciterable"],
     "sourceMap": false,
     "outDir": "dist",
-    "rootDir": "src",
+    "rootDir": "./",
     "strict": true,
     "types": ["node"],
     "esModuleInterop": true,
@@ -19,7 +19,7 @@
     "noFallthroughCasesInSwitch": true,
     "removeComments": true,
     "paths": {
-      "@/*": ["./*"]
+
     }
   },
   "exclude": ["node_modules"]

@@ -1,7 +1,8 @@
-import * as appController from "@/controllers/app"
-import { auth } from "@/middlewares/auth"
-import * as accessApiToken from "@/controllers/accessApiToken"
+import * as appController from "../../controllers/app"
+import { auth } from "../../middlewares/auth"
 
+import * as userController from "../../controllers/user"
+import * as memberController from "../../controllers/member"
 export default {
 	hello: () => {
 		return "Hello"
@@ -9,5 +10,7 @@ export default {
 	apps: auth(appController.getApps),
 	app: auth(appController.getAppBySlug),
 
-	getAccessApiToken: auth(accessApiToken.getAcessToken),
+	searchUser: userController.searchUser,
+	getMembersByApp: auth(memberController.getMembersByApp),
+	getAppInvite: auth(appController.getAppInvite),
 }

@@ -14,6 +14,7 @@ export default gql`
         updateSchema(input: UpdateSchemaInput!): Schema!
         deleteSchema(input: DeleteSchemaInput!): String!
 
-        createAccessApiToken(input: CreateAccessApiTokenInput!): String!
+        sendInvite(input: SendInviteInput): Member!
+        actionInvite(input: ActionInviteInput): App!
     }
 `

@@ -1,8 +1,8 @@
-import { auth } from "@/middlewares/auth"
-import * as authController from "@/controllers/auth"
-import * as appController from "@/controllers/app"
-import * as accessApiToken from "@/controllers/accessApiToken"
-import * as schemaController from "@/controllers/schema"
+import { auth } from "../../middlewares/auth"
+import * as authController from "../../controllers/auth"
+import * as appController from "../../controllers/app"
+import * as schemaController from "../../controllers/schema"
+import * as memberController from "../../controllers/member"
 
 export default {
 	signIn: authController.signIn,
@@ -17,5 +17,6 @@ export default {
 	updateSchema: auth(schemaController.updateSchema),
 	deleteSchema: auth(schemaController.deleteSchema),
 
-	createAccessApiToken: auth(accessApiToken.createAccessToken),
+	sendInvite: auth(memberController.sendInvite),
+	actionInvite: auth(appController.actionInvite),
 }

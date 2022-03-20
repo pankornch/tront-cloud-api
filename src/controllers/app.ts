@@ -1,10 +1,8 @@
-import ApiSchema from "@/models/ApiSchema"
-import ApiType from "@/models/ApiType"
-import App from "@/models/App"
-import Model from "@/models/Model"
-import { IApp, Resolver } from "@/types"
-import { handleCreateApi, handleCreateModels } from "@/utils/apiSchemaHelper"
+import { ApiSchema, App, ApiType, Member, Model } from "../models"
+import { IApp, Resolver } from "../types"
+import { handleCreateApi, handleCreateModels } from "../utils/apiSchemaHelper"
 import { ForbiddenError, UserInputError } from "apollo-server-core"
+import { ObjectId } from "mongodb"
 
 interface CreateAppInput extends IApp {}
 export const createApp: Resolver<null, { input: CreateAppInput }> = async (
@@ -19,21 +17,21 @@ export const createApp: Resolver<null, { input: CreateAppInput }> = async (
 		user: user!._id,
 	})
 
-	const $models = handleCreateModels(input.modelConfigs.models, app)
-	const $apis = []
+	// const $models = handleCreateModels(input.modelConfigs.models, app)
+	// const $apis = []
 
-	try {
-		for (const $model of $models) {
-			$apis.push(
-				handleCreateApi({
-					model: $model,
-					apiSchemas: input.apiConfigs.apiSchemas,
-				})
-			)
-		}
-	} catch (error: any) {
-		throw new UserInputError(error.message)
-	}
+	// try {
+	// 	for (const $model of $models) {
+	// 		$apis.push(
+	// 			handleCreateApi({
+	// 				model: $model,
+	// 				apiSchemas: input.apiConfigs.apiSchemas,
+	// 			})
+	// 		)
+	// 	}
+	// } catch (error: any) {
+	// 	throw new UserInputError(error.message)
+	// }
 
 	const apiType = new ApiType({
 		app: app._id,
@@ -41,10 +39,18 @@ export const createApp: Resolver<null, { input: CreateAppInput }> = async (
 		url: `/api/rest/${app.slug}`,
 	})
 
+	const member = new Member({
+		app: app._id,
+		user: user?._id,
+		role: "OWNER",
+		status: true,
+	})
+
 	await Promise.all([
 		app.save(),
-		Model.insertMany($models),
-		ApiSchema.insertMany($apis),
+		member.save(),
+		// Model.insertMany($models),
+		// ApiSchema.insertMany($apis),
 		apiType.save(),
 	])
 
@@ -52,26 +58,89 @@ export const createApp: Resolver<null, { input: CreateAppInput }> = async (
 }
 
 export const getApps: Resolver = async (parent, arg, { user }) => {
-	const apps = await App.find({
-		user: user!._id,
-	})
-		.sort({ createdAt: -1 })
-		.lean()
+	// const apps = await App.find({
+	// 	user: user!._id,
+	// })
+	// 	.sort({ createdAt: -1 })
+	// 	.lean()
+
+	const apps = await App.aggregate([
+		{
+			$lookup: {
+				from: "members",
+				localField: "_id",
+				foreignField: "app",
+				as: "members",
+			},
+		},
+		{
+			$match: {
+				members: {
+					$elemMatch: {
+						$and: [
+							{
+								user: new ObjectId(user?._id),
+							},
+							{
+								status: true,
+							},
+						],
+					},
+				},
+			},
+		},
+		{
+			$sort: {
+				createdAt: -1,
+			},
+		},
+	])
 
 	return apps
 }
 
 export const getAppBySlug: Resolver = async (_, { slug }, { user }) => {
-	const app = await App.findOne({
-		$and: [
-			{
+	// const app = await App.findOne({
+	// 	$and: [
+	// 		{
+	// 			slug: slug,
+	// 		},
+	// 		{
+	// 			user: user!._id,
+	// 		},
+	// 	],
+	// })
+	const [app] = await App.aggregate([
+		{
+			$match: {
 				slug: slug,
 			},
-			{
-				user: user!._id,
+		},
+		{
+			$lookup: {
+				from: "members",
+				localField: "_id",
+				foreignField: "app",
+				as: "members",
 			},
-		],
-	})
+		},
+		{
+			$match: {
+				members: {
+					$elemMatch: {
+						$and: [
+							{
+								user: new ObjectId(user?._id),
+							},
+							{
+								status: true,
+							},
+						],
+					},
+				},
+			},
+		},
+	])
 
 	if (!app) {
 		throw new ForbiddenError("Incorrect app")
@@ -137,4 +206,83 @@ export const deleteApp: Resolver<any, { input: DeleteAppInput }> = async (
 	])
 
 	return "Delete Successful"
+}
+
+export const getAppInvite: Resolver = async (_, __, { user }) => {
+	const apps = await App.aggregate([
+		{
+			$lookup: {
+				from: "members",
+				localField: "_id",
+				foreignField: "app",
+				as: "members",
+			},
+		},
+		{
+			$match: {
+				members: {
+					$elemMatch: {
+						$and: [
+							{
+								user: new ObjectId(user?._id),
+							},
+							{
+								status: false,
+							},
+						],
+					},
+				},
+			},
+		},
+		{
+			$sort: {
+				createdAt: -1,
+			},
+		},
+	])
+
+	return apps
+}
+
+interface ActionInviteInput {
+	input: {
+		appId: string
+		status: boolean
+	}
+}
+export const actionInvite: Resolver<null, ActionInviteInput> = async (
+	_,
+	{ input },
+	{ user }
+) => {
+	const member = await Member.findOne(
+		{
+			$and: [
+				{
+					user: user?._id,
+				},
+				{
+					app: input.appId,
+				},
+			],
+		},
+		
+	)
+
+	if (!member) {
+		throw new UserInputError("Incorrect app id")
+	}
+
+	if (!input.status) {
+		await member.delete()
+	} else {
+		member.status = true
+	}
+
+	const [app, __] = await Promise.all([
+		App.findById(input.appId).lean(),
+		member.save()
+	])
+
+	return app
 }

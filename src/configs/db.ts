@@ -8,6 +8,8 @@ const wait = (ms: number) => {
 export default async () => {
 	let error: any
 
+	console.log("\n Connecting database... \n")
+	
 	for (let i = 1; i <= 5; i++) {
 		const conn = await connet()
 		if (!conn?.error) {
@@ -25,6 +27,7 @@ export default async () => {
 }
 
 const connet = async () => {
+	console.log("\n Connecting database... \n")
 	try {
 		const uri = DATABASE_URL + "/" + DATABASE_NAME
 		await mongoose.connect(uri)

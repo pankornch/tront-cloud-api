@@ -1,0 +1,42 @@
+org: pankornch
+app: tront-api
+service: apollo-lambda
+provider:
+  name: aws
+  runtime: nodejs14.x
+  region: ap-southeast-1
+  environment:
+    DATABASE_URL: ${param:DATABASE_URL}
+    DATABASE_NAME: ${param:DATABASE_NAME}
+    JWT_SECRET: ${param:JWT_SECRET}
+    API_JWT_SECRET: ${param:API_JWT_SECRET}
+    API_DATABASE_URL: ${param:API_DATABASE_URL}
+    API_URL: ${param:API_URL}
+
+functions:
+  graphql:
+    handler: src/index.handler
+    events:
+    - http:
+        path: /graphql
+        method: post
+        cors: true
+    - http:
+        path: /
+        method: get
+        cors: true
+  app:
+    handler: src/generateApi/handler.handler
+    events:
+      - http: 'ANY /api/{proxy+}'
+
+plugins:
+  - serverless-offline
+  - serverless-plugin-typescript
+  - serverless-dotenv-plugin
+
+custom:
+  serverless-offline:
+    useChildProcesses: true
+    httpPort: 4000
+useDotenv: true

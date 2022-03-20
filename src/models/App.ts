@@ -1,4 +1,4 @@
-import { IApp } from "@/types"
+import { IApp } from "../types"
 import { model, Schema, Types } from "mongoose"
 
 export default model<IApp>(

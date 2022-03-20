@@ -1,4 +1,4 @@
-import { IApiSchema } from "@/types"
+import { IApiSchema } from "../types"
 import { model, Schema, Types } from "mongoose"
 
 export default model<IApiSchema>(

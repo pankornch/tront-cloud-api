@@ -16,18 +16,13 @@ export default gql`
 		type: AuthTypes!
 		providerAccountId: String!
 		email: String!
+		avatar: String!
 	}
 
 	input CreateAppInput {
 		name: String!
 		slug: String!
 		description: String
-		modelConfigs: ModelConfigsInput!
-		apiConfigs: ApiConfigsInput
-	}
-
-	input ModelConfigsInput {
-		models: [ModelInput]!
 	}
 
 	input ModelInput {
@@ -43,15 +38,6 @@ export default gql`
 		defaultValue: String
 	}
 
-	input ApiConfigsInput {
-		apiTypes: [ApiTypeInput]
-		apiSchemas: [ApiSchemaInput]
-	}
-
-	input ApiTypeInput {
-		type: String!
-		url: String!
-	}
 
 	input ApiSchemaInput {
 		_id: String
@@ -123,5 +109,23 @@ export default gql`
 	input DeleteSchemaInput {
 		modelId: ID!
 		appId: ID!
+	}
+
+	input SearchUserInput {
+		email: String!
+	}
+
+	input SendInviteInput {
+		email: String!
+		appId: ID!
+	}
+
+	input GetMembersByAppInput {
+		appId: ID!
+	}
+
+	input ActionInviteInput {
+		appId: ID!
+		status: Boolean!
 	}
 `

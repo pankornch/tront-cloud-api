@@ -1,18 +1,24 @@
-import { IApiSchema, IApp, ResolverType } from "@/types"
-import Model from "@/models/Model"
-import ApiType from "@/models/ApiType"
-import ApiSchema from "@/models/ApiSchema"
-import { API_URL } from "@/configs/env"
+import { IApiSchema, IApp, ResolverType } from "../../types"
+import Model from "../../models/Model"
+import ApiType from "../../models/ApiType"
+import ApiSchema from "../../models/ApiSchema"
+import { API_URL } from "../../configs/env"
+import { Member, User } from "../../models"
 
 export const AppResolver: ResolverType<IApp> = {
 	modelConfigs: async (parent) => {
-		const models = await Model.find({
-			app: parent._id,
-		})
-		return { models }
+		return parent
 	},
 	apiConfigs: async (parent) => {
 		return parent
+	},
+	user: async (parent) => {
+		const user = await User.findById(parent.user).lean()
+		return user
+	},
+	members: async (parent) => {
+		const members = await Member.find({ app: parent._id }).lean()
+		return members
 	},
 }
 

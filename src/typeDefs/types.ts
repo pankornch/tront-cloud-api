@@ -4,6 +4,7 @@ export default gql`
     type User {
         _id: ID
         email: String!
+        avatar: String!
         accounts: [Account]!
     }
 
@@ -20,16 +21,19 @@ export default gql`
 
     type App {
         _id: ID!
+        user: User!
         name: String!
         description: String
         slug: String!
         active: Boolean!
         modelConfigs: ModelConfigs!
         apiConfigs: ApiConfigs!
+        members: [Member]!
         createdAt: Date!
     }
 
     type ModelConfigs {
+        app: App!
         models: [Model]!
     }
 
@@ -72,6 +76,16 @@ export default gql`
     type Schema {
         model: Model!
         apiSchema: ApiSchema!
+    }
+
+    type Member {
+        _id: ID!
+        app: App!
+        user: User!
+        role: String!
+        status: Boolean!
+        createdAt: Date!
+        updatedAt: Date!
     }
 
     enum AuthTypes {

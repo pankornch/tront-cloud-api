@@ -1,4 +1,4 @@
-import { ID } from "@/types"
+import { ID } from "../types"
 
 export const apiNamespace = {
 	dbName(userId: ID) {

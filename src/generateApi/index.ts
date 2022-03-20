@@ -1,19 +1,25 @@
-import { ID } from "@/types"
+import { ID, IModel, IModelRelationship, ModelTypes } from "../types"
 import express from "express"
 import Joi from "joi"
 import aqp from "api-query-params"
 
 const router = express.Router()
 import { ObjectId } from "mongodb"
-import { apiNamespace } from "@/utils/apiNamespace"
-import { mapToJoi, apiModel, validateApp } from "@/utils/generateApiHelper"
-import { clamp } from "@/utils/helpers"
+import { apiNamespace } from "../utils/apiNamespace"
+import {
+	mapToJoi,
+	apiModel,
+	validateApp,
+	populate,
+} from "../utils/generateApiHelper"
+import { clamp } from "../utils/helpers"
+import { ModelRelationship } from "../models"
 
 router.use(express.json())
 
 router.get("/rest/:slug/:modelName", async (req, res) => {
 	const { params } = req
-	const { filter, skip, limit, sort } = aqp(req.query)
+	const { filter, skip, limit, sort, projection, population } = aqp(req.query)
 
 	try {
 		const { app, model, ...result } = await validateApp({
@@ -30,21 +36,57 @@ router.get("/rest/:slug/:modelName", async (req, res) => {
 		const dbName = apiNamespace.dbName(app!.user as ID)
 		const colName = apiNamespace.colName(app!._id, model!._id)
 		const col = await apiModel({ dbName, colName })
-		const data = await col
-			.find()
-			.filter(filter)
-			.skip(skip || 0)
-			.limit(clamp(limit, 100, 10))
-			.sort(sort as any)
-			.toArray()
 
-		res.send({
-			data,
-			filter,
-			skip,
-			limit,
-			sort,
-		})
+		const regexFilter: Record<string, any> = {}
+
+		if (Object.keys(filter).length) {
+			Object.entries(filter).forEach(([k, v]) => {
+				regexFilter[k] = { $regex: new RegExp(v, "gi") }
+			})
+		}
+
+		const $filter = Object.keys(regexFilter).length ? regexFilter : {}
+
+		if (population.length) {
+			const data = await populate({
+				population,
+				app,
+				model,
+				$filter,
+				limit,
+				skip,
+				col,
+				sort,
+				projection,
+			})
+			res.send({
+				totalCounts: await col.countDocuments(),
+				data,
+				filter: $filter,
+				skip: skip || 0,
+				limit: clamp(limit, 100, 10),
+				sort,
+			})
+		} else {
+			const data = await col
+				.find()
+				.filter($filter)
+				.skip(skip || 0)
+				.limit(clamp(limit, 100, 10))
+				.sort(sort as any)
+				.project(projection)
+
+				.toArray()
+
+			res.send({
+				totalCounts: await col.countDocuments(),
+				data,
+				filter: $filter,
+				skip: skip || 0,
+				limit: clamp(limit, 100, 10),
+				sort,
+			})
+		}
 	} catch (error: any) {
 		res.status(500).send({ error: error.message })
 	}
@@ -90,7 +132,7 @@ router.post("/rest/:slug/:modelName", async (req, res) => {
 		const { app, model, ...result } = await validateApp({
 			appSlug: params.slug,
 			modelName: params.modelName,
-			methodName: "POST"
+			methodName: "POST",
 		})
 
 		if (!result.status) {
@@ -99,11 +141,12 @@ router.post("/rest/:slug/:modelName", async (req, res) => {
 		}
 
 		const obj: any = {}
-
+		const mapFields: Record<string, ModelTypes> = {}
 		for (const field of model!.fields) {
 			if (field.name !== "_id") {
 				obj[field.name] = mapToJoi(field.type, field.required)
 			}
+			mapFields[field.name] = field.type
 		}
 
 		const { error } = Joi.object(obj).validate(body)
@@ -118,6 +161,14 @@ router.post("/rest/:slug/:modelName", async (req, res) => {
 		const dbName = apiNamespace.dbName(app!.user as ID)
 		const colName = apiNamespace.colName(app!._id, model!._id)
 		const col = await apiModel({ dbName, colName })
+
+		Object.entries(body).forEach(([k, v]) => {
+			console.log(mapFields[k])
+			if (mapFields[k] === "OBJECT_ID") {
+				body[k] = new ObjectId(v as string)
+			}
+		})
+
 		const data = await col.insertOne(body)
 
 		res.status(201).send(await col.findOne({ _id: data.insertedId }))

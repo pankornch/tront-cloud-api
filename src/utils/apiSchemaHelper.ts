@@ -1,6 +1,6 @@
-import ApiSchema from "@/models/ApiSchema"
-import Model from "@/models/Model"
-import { ApiNames, IApiMethod, IApiSchema, IApp, IModel } from "@/types"
+import ApiSchema from "../models/ApiSchema"
+import Model from "../models/Model"
+import { ApiNames, IApiMethod, IApiSchema, IApp, IModel } from "../types"
 
 export const handleCreateModels = (models: IModel[], app: IApp) => {
 	let $models = []

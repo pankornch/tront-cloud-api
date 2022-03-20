@@ -21,6 +21,7 @@ export type ApiTypes = "REST"
 export interface IUser {
 	_id: ID
 	email: string
+	avatar: string
 	accounts: IAccount[]
 	createdAt: Date
 	updatedAt: Date
@@ -53,7 +54,9 @@ export interface IApp {
 
 export interface IModelConfigs {
 	_id: ID
+	app: ID | IApp
 	models: IModel[]
+	relationships: IModelRelationship[]
 }
 
 export interface IModel {
@@ -96,7 +99,15 @@ export interface IApiMethod {
 	pathname: string
 }
 
-
+export interface IMember {
+	_id: ID
+	app: ID | IApp
+	user: ID | IUser
+	role: string
+	status: boolean
+	createdAt: Date
+	updatedAt: Date
+}
 
 export interface IApiToken {
 	_id: ID
@@ -107,4 +118,16 @@ export interface IApiToken {
 	expiredAt: Date
 	createdAt: Date
 	updatedAt: Date
+}
+
+
+export interface IModelRelationship {
+	_id: ID
+	app: ID | IApp
+	localModel: ID | IModel
+	localField: string
+	targetModel: ID | IModel
+	targetField: String
+	hasMany: boolean
+	alias: string
 }

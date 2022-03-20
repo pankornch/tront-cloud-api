@@ -1,6 +1,6 @@
-import { User } from "@/models"
-import { Resolver } from "@/types"
-import { verifyToken } from "@/utils/jwt"
+import { User } from "../models"
+import { Resolver } from "../types"
+import { verifyToken } from "../utils/jwt"
 import { AuthenticationError } from "apollo-server-core"
 
 export const auth = (handler: Resolver): Resolver => {

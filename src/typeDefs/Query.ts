@@ -6,6 +6,8 @@ export default gql`
 		apps: [App]!
 		app(slug: ID!): App!
 
-		getAccessApiToken(input: GetAccessApiTokenInput!): String
+		searchUser(input: SearchUserInput!): [User]
+		getMembersByApp(input: GetMembersByAppInput!): [Member]!
+		getAppInvite: [App]!
 	}
 `

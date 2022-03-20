@@ -1,4 +1,4 @@
-import { IUser } from "@/types"
+import { IUser } from "../types"
 import { model, Schema, Types } from "mongoose"
 
 export default model<IUser>(
@@ -6,6 +6,10 @@ export default model<IUser>(
 	new Schema(
 		{
 			email: {
+				type: String,
+				required: true,
+			},
+			avatar: {
 				type: String,
 				required: true,
 			},
